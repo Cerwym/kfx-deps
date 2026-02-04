@@ -1032,6 +1032,155 @@ jobs:
             ${{github.workspace}}/tomlc99/build/include
             ${{github.workspace}}/tomlc99/build/libtoml.a
 
+  swscale-mingw32:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install mingw-w64
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq \
+            --no-install-recommends mingw-w64
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout ffmpeg
+        uses: actions/checkout@v4
+        with:
+          repository: FFmpeg/FFmpeg
+          ref: release/6.1
+          path: ffmpeg
+      - name: Configure
+        run: |
+          cd ${{github.workspace}}/ffmpeg && ./configure \
+            --arch=x86 \
+            --target-os=mingw32 \
+            --cross-prefix=i686-w64-mingw32- \
+            --enable-cross-compile \
+            --enable-static \
+            --disable-shared \
+            --disable-programs \
+            --disable-doc \
+            --disable-avdevice \
+            --disable-avfilter \
+            --disable-avformat \
+            --disable-avcodec \
+            --disable-swresample \
+            --disable-postproc \
+            --enable-swscale \
+            --disable-x86asm
+      - name: Build
+        run: make -C ${{github.workspace}}/ffmpeg -j4
+      - name: Package files
+        run: |
+          mkdir -p ${{github.workspace}}/ffmpeg/build/libswscale/include
+          mkdir -p ${{github.workspace}}/ffmpeg/build/libswscale/lib
+          cp ${{github.workspace}}/ffmpeg/libswscale/swscale.h \
+             ${{github.workspace}}/ffmpeg/libswscale/version.h \
+             ${{github.workspace}}/ffmpeg/libswscale/version_major.h \
+             ${{github.workspace}}/ffmpeg/build/libswscale/include/
+          cp ${{github.workspace}}/ffmpeg/libswscale/libswscale.a \
+             ${{github.workspace}}/ffmpeg/build/libswscale/lib/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: swscale-mingw32
+          path: ${{github.workspace}}/ffmpeg/build/libswscale
+
+  swscale-mingw64:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install mingw-w64
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq \
+            --no-install-recommends mingw-w64
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout ffmpeg
+        uses: actions/checkout@v4
+        with:
+          repository: FFmpeg/FFmpeg
+          ref: release/6.1
+          path: ffmpeg
+      - name: Configure
+        run: |
+          cd ${{github.workspace}}/ffmpeg && ./configure \
+            --arch=x86_64 \
+            --target-os=mingw32 \
+            --cross-prefix=x86_64-w64-mingw32- \
+            --enable-cross-compile \
+            --enable-static \
+            --disable-shared \
+            --disable-programs \
+            --disable-doc \
+            --disable-avdevice \
+            --disable-avfilter \
+            --disable-avformat \
+            --disable-avcodec \
+            --disable-swresample \
+            --disable-postproc \
+            --enable-swscale \
+            --disable-x86asm
+      - name: Build
+        run: make -C ${{github.workspace}}/ffmpeg -j4
+      - name: Package files
+        run: |
+          mkdir -p ${{github.workspace}}/ffmpeg/build/libswscale/include
+          mkdir -p ${{github.workspace}}/ffmpeg/build/libswscale/lib
+          cp ${{github.workspace}}/ffmpeg/libswscale/swscale.h \
+             ${{github.workspace}}/ffmpeg/libswscale/version.h \
+             ${{github.workspace}}/ffmpeg/libswscale/version_major.h \
+             ${{github.workspace}}/ffmpeg/build/libswscale/include/
+          cp ${{github.workspace}}/ffmpeg/libswscale/libswscale.a \
+             ${{github.workspace}}/ffmpeg/build/libswscale/lib/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: swscale-mingw64
+          path: ${{github.workspace}}/ffmpeg/build/libswscale
+
+  swscale-lin64:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout ffmpeg
+        uses: actions/checkout@v4
+        with:
+          repository: FFmpeg/FFmpeg
+          ref: release/6.1
+          path: ffmpeg
+      - name: Configure
+        run: |
+          cd ${{github.workspace}}/ffmpeg && ./configure \
+            --enable-static \
+            --disable-shared \
+            --disable-programs \
+            --disable-doc \
+            --disable-avdevice \
+            --disable-avfilter \
+            --disable-avformat \
+            --disable-avcodec \
+            --disable-swresample \
+            --disable-postproc \
+            --enable-swscale
+      - name: Build
+        run: make -C ${{github.workspace}}/ffmpeg -j4
+      - name: Package files
+        run: |
+          mkdir -p ${{github.workspace}}/ffmpeg/build/libswscale/include
+          mkdir -p ${{github.workspace}}/ffmpeg/build/libswscale/lib
+          cp ${{github.workspace}}/ffmpeg/libswscale/swscale.h \
+             ${{github.workspace}}/ffmpeg/libswscale/version.h \
+             ${{github.workspace}}/ffmpeg/libswscale/version_major.h \
+             ${{github.workspace}}/ffmpeg/build/libswscale/include/
+          cp ${{github.workspace}}/ffmpeg/libswscale/libswscale.a \
+             ${{github.workspace}}/ffmpeg/build/libswscale/lib/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: swscale-lin64
+          path: ${{github.workspace}}/ffmpeg/build/libswscale
+
   release:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-24.04
@@ -1061,6 +1210,9 @@ jobs:
       - centijson-lin64
       - astronomy-lin64
       - tomlc99-lin64
+      - swscale-mingw32
+      - swscale-mingw64
+      - swscale-lin64
     steps:
       - name: Download zlib-mingw32
         uses: actions/download-artifact@v4
@@ -1188,6 +1340,21 @@ jobs:
         with:
           name: tomlc99-lin64
           path: ${{github.workspace}}/tomlc99-lin64
+      - name: Download swscale-mingw32
+        uses: actions/download-artifact@v4
+        with:
+          name: swscale-mingw32
+          path: ${{github.workspace}}/swscale-mingw32
+      - name: Download swscale-mingw64
+        uses: actions/download-artifact@v4
+        with:
+          name: swscale-mingw64
+          path: ${{github.workspace}}/swscale-mingw64
+      - name: Download swscale-lin64
+        uses: actions/download-artifact@v4
+        with:
+          name: swscale-lin64
+          path: ${{github.workspace}}/swscale-lin64
       - name: Create tarballs
         run: |
           tar czf ${{github.workspace}}/zlib-mingw32.tar.gz -C ${{github.workspace}}/zlib-mingw32 .
@@ -1215,6 +1382,9 @@ jobs:
           tar czf ${{github.workspace}}/centijson-lin64.tar.gz -C ${{github.workspace}}/centijson-lin64 .
           tar czf ${{github.workspace}}/astronomy-lin64.tar.gz -C ${{github.workspace}}/astronomy-lin64 .
           tar czf ${{github.workspace}}/tomlc99-lin64.tar.gz -C ${{github.workspace}}/tomlc99-lin64 .
+          tar czf ${{github.workspace}}/swscale-mingw32.tar.gz -C ${{github.workspace}}/swscale-mingw32 .
+          tar czf ${{github.workspace}}/swscale-mingw64.tar.gz -C ${{github.workspace}}/swscale-mingw64 .
+          tar czf ${{github.workspace}}/swscale-lin64.tar.gz -C ${{github.workspace}}/swscale-lin64 .
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -1246,3 +1416,6 @@ jobs:
             ${{github.workspace}}/centijson-lin64.tar.gz
             ${{github.workspace}}/astronomy-lin64.tar.gz
             ${{github.workspace}}/tomlc99-lin64.tar.gz
+            ${{github.workspace}}/swscale-mingw32.tar.gz
+            ${{github.workspace}}/swscale-mingw64.tar.gz
+            ${{github.workspace}}/swscale-lin64.tar.gz
