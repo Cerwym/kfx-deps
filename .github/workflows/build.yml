@@ -1162,7 +1162,8 @@ jobs:
             --disable-avcodec \
             --disable-swresample \
             --disable-postproc \
-            --enable-swscale
+            --enable-swscale \
+            --disable-x86asm
       - name: Build
         run: make -C ${{github.workspace}}/ffmpeg -j4
       - name: Package files
