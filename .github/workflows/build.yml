@@ -239,12 +239,30 @@ jobs:
   ffmpeg-mingw32:
     runs-on: ubuntu-24.04
     steps:
-      - name: Install mingw-w64
+      - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends mingw-w64
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq \
+            --no-install-recommends mingw-w64 nasm
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Checkout x264
+        uses: actions/checkout@v4
+        with:
+          repository: mirror/x264
+          ref: master
+          path: x264
+      - name: Build x264
+        run: |
+          cd ${{github.workspace}}/x264 && ./configure \
+            --host=i686-w64-mingw32 \
+            --cross-prefix=i686-w64-mingw32- \
+            --enable-static \
+            --disable-cli \
+            --disable-opencl \
+            --bit-depth=8
+          make -C ${{github.workspace}}/x264 -j4
+          make -C ${{github.workspace}}/x264 install-lib-static DESTDIR=${{github.workspace}}/x264-install
       - name: Checkout ffmpeg
         uses: actions/checkout@v4
         with:
@@ -253,7 +271,7 @@ jobs:
           path: ffmpeg
       - name: Configure
         run: |
-            cd ${{github.workspace}}/ffmpeg && ./configure \
+            cd ${{github.workspace}}/ffmpeg && PKG_CONFIG_PATH=${{github.workspace}}/x264-install/usr/local/lib/pkgconfig ./configure \
               --arch=i686 \
               --target-os=mingw32 \
               --cross-prefix=i686-w64-mingw32- \
@@ -269,12 +287,15 @@ jobs:
               --enable-avcodec \
               --enable-swscale \
               --enable-swresample \
-              --enable-encoder=h264,mjpeg,mpeg4 \
+              --enable-gpl \
+              --enable-libx264 \
+              --enable-encoder=libx264,mpeg4,mjpeg \
               --enable-decoder=h264,mjpeg,mpeg4,smacker,smackaud \
               --enable-muxer=mp4,avi,matroska \
               --enable-demuxer=smacker,avi,mov \
               --enable-protocol=file \
-              --enable-gpl \
+              --extra-cflags="-I${{github.workspace}}/x264-install/usr/local/include" \
+              --extra-ldflags="-L${{github.workspace}}/x264-install/usr/local/lib" \
               --enable-small
       - name: Build
         run: |
@@ -742,7 +763,7 @@ jobs:
               --enable-avcodec \
               --enable-swscale \
               --enable-swresample \
-              --enable-encoder=h264,mjpeg,mpeg4 \
+              --enable-encoder=mpeg4,mjpeg \
               --enable-decoder=h264,mjpeg,mpeg4,smacker,smackaud \
               --enable-muxer=mp4,avi,matroska \
               --enable-demuxer=smacker,avi,mov \
@@ -1062,7 +1083,6 @@ jobs:
             --disable-swresample \
             --disable-postproc \
             --enable-swscale \
-            --disable-x86asm
       - name: Build
         run: make -C ${{github.workspace}}/ffmpeg -j4
       - name: Package files
@@ -1115,7 +1135,6 @@ jobs:
             --disable-swresample \
             --disable-postproc \
             --enable-swscale \
-            --disable-x86asm
       - name: Build
         run: make -C ${{github.workspace}}/ffmpeg -j4
       - name: Package files
@@ -1159,7 +1178,6 @@ jobs:
             --disable-swresample \
             --disable-postproc \
             --enable-swscale \
-            --disable-x86asm
       - name: Build
         run: make -C ${{github.workspace}}/ffmpeg -j4
       - name: Package files
