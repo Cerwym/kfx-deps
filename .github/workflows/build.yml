@@ -254,40 +254,36 @@ jobs:
       - name: Configure
         run: |
             cd ${{github.workspace}}/ffmpeg && ./configure \
-              --disable-x86asm \
-              --disable-programs \
-              --disable-doc \
-              --disable-devices \
-              --disable-everything \
-              --disable-filters \
-              --disable-static \
-              --disable-avdevice \
-              --disable-swscale \
-              --disable-avfilter \
-              --disable-network \
-              --disable-dwt \
-              --disable-lsp \
-              --disable-faan \
-              --disable-iamf \
-              --disable-pixelutils \
-              --disable-debug \
-              --enable-shared \
-              --enable-small \
-              --enable-decoder=smacker \
-              --enable-decoder=smackaud \
-              --enable-demuxer=smacker \
-              --enable-protocol=file \
               --arch=i686 \
               --target-os=mingw32 \
               --cross-prefix=i686-w64-mingw32- \
-              --enable-cross-compile
+              --enable-cross-compile \
+              --enable-static \
+              --disable-shared \
+              --disable-programs \
+              --disable-doc \
+              --disable-avdevice \
+              --disable-postproc \
+              --disable-debug \
+              --enable-avformat \
+              --enable-avcodec \
+              --enable-swscale \
+              --enable-swresample \
+              --enable-encoder=h264,mjpeg,mpeg4 \
+              --enable-decoder=h264,mjpeg,mpeg4,smacker,smackaud \
+              --enable-muxer=mp4,avi,matroska \
+              --enable-demuxer=smacker,avi,mov \
+              --enable-protocol=file \
+              --enable-gpl \
+              --enable-small
       - name: Build
         run: |
             make -C ${{github.workspace}}/ffmpeg \
               libavformat/libavformat.a \
               libavcodec/libavcodec.a \
               libavutil/libavutil.a \
-              libswresample/libswresample.a
+              libswresample/libswresample.a \
+              libswscale/libswscale.a
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -301,6 +297,8 @@ jobs:
             ${{github.workspace}}/ffmpeg/libavutil/libavutil.a
             ${{github.workspace}}/ffmpeg/libswresample/*.h
             ${{github.workspace}}/ffmpeg/libswresample/libswresample.a
+            ${{github.workspace}}/ffmpeg/libswscale/*.h
+            ${{github.workspace}}/ffmpeg/libswscale/libswscale.a
 
   openal-mingw32:
     runs-on: ubuntu-24.04
@@ -729,40 +727,36 @@ jobs:
       - name: Configure
         run: |
             cd ${{github.workspace}}/ffmpeg && ./configure \
-              --disable-x86asm \
-              --disable-programs \
-              --disable-doc \
-              --disable-devices \
-              --disable-everything \
-              --disable-filters \
-              --disable-static \
-              --disable-avdevice \
-              --disable-swscale \
-              --disable-avfilter \
-              --disable-network \
-              --disable-dwt \
-              --disable-lsp \
-              --disable-faan \
-              --disable-iamf \
-              --disable-pixelutils \
-              --disable-debug \
-              --enable-shared \
-              --enable-small \
-              --enable-decoder=smacker \
-              --enable-decoder=smackaud \
-              --enable-demuxer=smacker \
-              --enable-protocol=file \
               --arch=x86_64 \
               --target-os=mingw32 \
               --cross-prefix=x86_64-w64-mingw32- \
-              --enable-cross-compile
+              --enable-cross-compile \
+              --enable-static \
+              --disable-shared \
+              --disable-programs \
+              --disable-doc \
+              --disable-avdevice \
+              --disable-postproc \
+              --disable-debug \
+              --enable-avformat \
+              --enable-avcodec \
+              --enable-swscale \
+              --enable-swresample \
+              --enable-encoder=h264,mjpeg,mpeg4 \
+              --enable-decoder=h264,mjpeg,mpeg4,smacker,smackaud \
+              --enable-muxer=mp4,avi,matroska \
+              --enable-demuxer=smacker,avi,mov \
+              --enable-protocol=file \
+              --enable-gpl \
+              --enable-small
       - name: Build
         run: |
             make -C ${{github.workspace}}/ffmpeg \
               libavformat/libavformat.a \
               libavcodec/libavcodec.a \
               libavutil/libavutil.a \
-              libswresample/libswresample.a
+              libswresample/libswresample.a \
+              libswscale/libswscale.a
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -776,6 +770,8 @@ jobs:
             ${{github.workspace}}/ffmpeg/libavutil/libavutil.a
             ${{github.workspace}}/ffmpeg/libswresample/*.h
             ${{github.workspace}}/ffmpeg/libswresample/libswresample.a
+            ${{github.workspace}}/ffmpeg/libswscale/*.h
+            ${{github.workspace}}/ffmpeg/libswscale/libswscale.a
 
   openal-mingw64:
     runs-on: ubuntu-24.04
