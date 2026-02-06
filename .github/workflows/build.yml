@@ -272,7 +272,7 @@ jobs:
           path: ffmpeg
       - name: Configure
         run: |
-            cd ${{github.workspace}}/ffmpeg && PKG_CONFIG_PATH=${{github.workspace}}/x264-install/lib/pkgconfig PKG_CONFIG="pkg-config --static" ./configure \
+            cd ${{github.workspace}}/ffmpeg && PKG_CONFIG_LIBDIR=${{github.workspace}}/x264-install/lib/pkgconfig ./configure \
               --arch=i686 \
               --target-os=mingw32 \
               --cross-prefix=i686-w64-mingw32- \
