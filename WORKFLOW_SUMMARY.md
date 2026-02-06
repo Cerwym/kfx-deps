@@ -152,3 +152,7 @@ After workflow runs:
 ---
 
 **Status**: ✅ All code fixes complete, ⏳ Awaiting workflow approval for final verification
+
+### Issue 3 (Resolved)
+- **Error**: "nasm not found or too old" in ffmpeg-mingw64
+- **Resolution**: Added nasm to ffmpeg-mingw64 build dependencies (commit 95a01ab)
