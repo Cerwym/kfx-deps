@@ -272,7 +272,7 @@ jobs:
           path: ffmpeg
       - name: Configure
         run: |
-            cd ${{github.workspace}}/ffmpeg && PKG_CONFIG_PATH=${{github.workspace}}/x264-install/lib/pkgconfig ./configure \
+            cd ${{github.workspace}}/ffmpeg && PKG_CONFIG_PATH=${{github.workspace}}/x264-install/lib/pkgconfig PKG_CONFIG="pkg-config --static" ./configure \
               --arch=i686 \
               --target-os=mingw32 \
               --cross-prefix=i686-w64-mingw32- \
@@ -334,7 +334,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: kcat/openal-soft
-          ref: master
+          ref: 1.23.1
           path: openal
       - name: Configure
         run: |
@@ -806,7 +806,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: kcat/openal-soft
-          ref: master
+          ref: 1.23.1
           path: openal
       - name: Configure
         run: |
