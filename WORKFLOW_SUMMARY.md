@@ -156,3 +156,8 @@ After workflow runs:
 ### Issue 3 (Resolved)
 - **Error**: "nasm not found or too old" in ffmpeg-mingw64
 - **Resolution**: Added nasm to ffmpeg-mingw64 build dependencies (commit 95a01ab)
+
+### Issue 4 (Resolved)
+- **Error**: "ERROR: x264 not found using pkg-config" (persistent after initial fix)
+- **Root Cause**: Incorrect use of PKG_CONFIG variable and PKG_CONFIG_PATH vs PKG_CONFIG_LIBDIR
+- **Resolution**: Changed to PKG_CONFIG_LIBDIR and removed incorrect PKG_CONFIG="pkg-config --static" (commit e7b5398)
